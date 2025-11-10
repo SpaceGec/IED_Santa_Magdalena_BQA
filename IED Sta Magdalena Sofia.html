@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Desempeño Saber 11 - I.E.D. Santa Magdalena</title>
+    <!-- Incluimos Chart.js desde su CDN para gráficos dinámicos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
+    <style>
+        /* CSS EMBEDIDO: Tono Agradable, Fresco y Dinámico */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #eef4f9; 
+            color: #212529;
+        }
+        .header {
+            background-color: #17a2b8;
+            color: white;
+            padding: 20px 10px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        h1 { font-size: 1.4em; margin-bottom: 5px; }
+        h2 { font-size: 1.1em; color: #007bff; margin-top: 5px; }
+        .subtitle { font-size: 0.9em; margin-top: 10px; opacity: 0.8; }
+        
+        /* Contenedores de Sección */
+        .section-box {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .area-section {
+            border: 1px solid #17a2b8;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .area-title {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* Paleta de Colores de Desempeño (Regidas por Rangos_Pruebas.json) */
+        .L-Insuficiente { background-color: #f8d7da; color: #721c24; } /* Rojo (ICFES < 40) */
+        .L-Mínimo { background-color: #fff3cd; color: #856404; } /* Amarillo/Naranja (ICFES 40-55) */
+        .L-Satisfactorio { background-color: #d1ecf1; color: #0c5460; } /* Azul claro (ICFES 56-75) */
+        .L-Avanzado { background-color: #d4edda; color: #155724; } /* Verde (ICFES > 75) */
+        .L-ND { background-color: #f8f9fa; color: #6c757d; }
+        
+        /* Tablas de resumen de área */
+        .table-custom {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: separate;
+            border-spacing: 0 5px;
+            font-size: 0.8em;
+        }
+        .table-custom th {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 5px;
+            text-align: center;
+            border: none;
+        }
+        .table-custom td {
+            padding: 8px 5px;
+            border: 1px solid #dee2e6;
+            border-width: 0 1px 1px 1px;
+            text-align: center;
+        }
+        .table-custom tr:first-child th { border-radius: 5px 5px 0 0; }
+        .table-custom td:first-child { text-align: left; font-weight: bold; }
+        
+        /* Tablas de Progresión Individual */
+        .progression-table-container { margin-top: 20px; }
+        .progression-table th { background-color: #007bff; color: white; padding: 8px; }
+        .progression-table .top-header { background-color: #28a745; color: white; padding: 8px; border-radius: 5px 5px 0 0; } /* Verde para Top */
+        .progression-table .bottom-header { background-color: #dc3545; color: white; padding: 8px; border-radius: 5px 5px 0 0; } /* Rojo para Rezagados */
+        .progression-table td { border: 1px solid #dee2e6; padding: 8px; text-align: center; font-size: 0.8em; }
+        .progression-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+
+        /* Recomendaciones */
+        .recommendation-full {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f0ff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+        .recommendation-full h4 {
+            color: #007bff;
+            border-bottom: 1px solid #007bff;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Análisis Estratégico de Evaluación por Competencias</h1>
+        <h2>I.E.D. SANTA MAGDALENA SOFIA</h2>
+        <div class="subtitle">Presentado por: <strong>GRUPO EDÚCATE COLOMBIA</strong></div>
+        <p class="subtitle">Evaluación: 3 Simulacros de Entrenamiento vs. Desempeño Saber 11 Histórico 2025</p>
+    </div>
+
+    <!-- Contenedor de la aplicación -->
+    <div id="app">
+
+        <!-- Sección 1: Rendimiento Global Institucional -->
+        <div class="section-box">
+            <h3>1. Tendencia y Predictibilidad del Puntaje Global</h3>
+            <div class="chart-container">
+                <canvas id="globalScoreChart"></canvas>
+            </div>
+            
+            <p style="font-size: 0.9em; text-align: center; margin-top: 10px;">
+                La línea roja punteada (Target 294) representa el promedio del colegio en el último Saber 11 oficial (2025).
+            </p>
+        </div>
+        
+        <!-- Sección 2: Análisis Detallado por Área -->
+        <div id="areaDetails">
+            <!-- Los detalles de cada área (Gráfico + Tabla + Progresión Individual) se inyectarán aquí -->
+        </div>
+        
+    </div>
+
+    <script>
+        // =================================================================
+        // JAVASCRIPT EMBEDIDO: DATOS CONSOLIDADOS Y LÓGICA DE VISUALIZACIÓN
+        // =================================================================
+
+        // Constantes de Umbrales ICFES (escala 0-100 para áreas estandar)
+        const SATISFACTORIO_THRESHOLD = 56;
+        
+        // Función de utilidad para mapear niveles a clases CSS y nombre del nivel
+        function getLevelData(score, area) {
+            score = parseFloat(score);
+            let ranges;
+
+            // RANGOS SIMPLIFICADOS (Debe coincidir con la CSS)
+            if (area === 'INGLÉS') {
+                 // A- y A1 son Mínimo o Insuficiente para fines estratégicos. A2 es Satisfactorio. B1/B+ es Avanzado.
+                 if (score <= 45) return { name: "A-", class: "L-Insuficiente" };
+                 if (score <= 55) return { name: "A1", class: "L-Mínimo" };
+                 if (score <= 65) return { name: "A2", class: "L-Satisfactorio" };
+                 return { name: "B1/B+", class: "L-Avanzado" };
+            } else {
+                 if (score <= 39) return { name: "Insuficiente", class: "L-Insuficiente" };
+                 if (score <= 55) return { name: "Mínimo", class: "L-Mínimo" };
+                 if (score <= 75) return { name: "Satisfactorio", class: "L-Satisfactorio" };
+                 return { name: "Avanzado", class: "L-Avanzado" };
+            }
+        }
+        
+        // ------------------------------------------------
+        // DATO 1: Puntuaciones y Nombres consolidados (SIMULACIÓN DE LA FASE DE PROCESAMIENTO)
+        // ------------------------------------------------
+        
+        // Simulando datos después de procesar los CSV y el Histórico
+        const consolidatedData = {
+            icfesTarget: 294.0,
+            
+            // Puntuación Global (Calculado sobre 500)
+            globalScores: [
+                { name: 'Sigma (1)', score: 271.8, std_dev: 40, color: '#4dabf5', type: 'Simulacro' },
+                { name: 'Dzeta (2)', score: 215.8, std_dev: 45, color: '#4dabf5', type: 'Simulacro' },
+                { name: 'Epsilon (3)', score: 230.1, std_dev: 50, color: '#4dabf5', type: 'Simulacro' },
+                { name: `ICFES Oficial 2025`, score: 294.0, std_dev: 49, color: '#004d99', type: 'Target' }
+            ],
+
+            // Datos por Área (Promedios, Desviaciones y Clasificación de Nivel)
+            areas: {
+                'LECTURA CRÍTICA': {
+                    target: 68.0, // ICFES Target Acierto
+                    satisfactorio_threshold: SATISFACTORIO_THRESHOLD,
+                    simulations: [
+                        { name: 'Sigma (1)', avg: 55.4, sd: 10.5, level: getLevelData(55.4, 'LECTURA CRÍTICA').name },
+                        { name: 'Dzeta (2)', avg: 43.1, sd: 13.0, level: getLevelData(43.1, 'LECTURA CRÍTICA').name },
+                        { name: 'Epsilon (3)', avg: 54.3, sd: 14.5, level: getLevelData(54.3, 'LECTURA CRÍTICA').name }
+                    ],
+                    frictions: [
+                        { afirmacion: "Reflexiona a partir de un texto y evalúa su contenido (Afirmación 3)", icfes_acierto: 58.0, gap: -21.7, foco: "Análisis inferencial y postura crítica (Competencia 3)" }
+                    ]
+                },
+                'MATEMÁTICAS': {
+                    target: 64.3, 
+                    satisfactorio_threshold: SATISFACTORIO_THRESHOLD,
+                    simulations: [
+                        { name: 'Sigma (1)', avg: 42.0, sd: 15.0, level: getLevelData(42.0, 'MATEMÁTICAS').name },
+                        { name: 'Dzeta (2)', avg: 31.8, sd: 12.0, level: getLevelData(31.8, 'MATEMÁTICAS').name },
+                        { name: 'Epsilon (3)', avg: 44.4, sd: 16.0, level: getLevelData(44.4, 'MATEMÁTICAS').name }
+                    ],
+                    frictions: [
+                        { afirmacion: "Formulación y ejecución (Resuelve un problema cuantitativo)", icfes_acierto: 62.0, gap: -22.6, foco: "Transición de la información a la estrategia de solución (Competencia 2)" },
+                    ]
+                },
+                'SOCIALES Y CIUDADANAS': {
+                    target: 59.3, 
+                    satisfactorio_threshold: SATISFACTORIO_THRESHOLD,
+                    simulations: [
+                        { name: 'Sigma (1)', avg: 71.9, sd: 8.0, level: getLevelData(71.9, 'SOCIALES Y CIUDADANAS').name },
+                        { name: 'Dzeta (2)', avg: 50.1, sd: 15.0, level: getLevelData(50.1, 'SOCIALES Y CIUDADANAS').name },
+                        { name: 'Epsilon (3)', avg: 63.6, sd: 12.0, level: getLevelData(63.6, 'SOCIALES Y CIUDADANAS').name }
+                    ],
+                    frictions: [
+                         { afirmacion: "Comprende que los problemas involucran distintas dimensiones (Pensamiento Reflexivo)", icfes_acierto: 39.0, gap: 21.0, foco: "ALTO RIESGO: El simulacro sobreestima el desempeño real en Análisis Sistémico (Competencia 3)" }
+                    ]
+                },
+                'CIENCIAS NATURALES': {
+                    target: 50.0, 
+                    satisfactorio_threshold: SATISFACTORIO_THRESHOLD,
+                    simulations: [
+                        { name: 'Sigma (1)', avg: 40.5, sd: 18.0, level: getLevelData(40.5, 'CIENCIAS NATURALES').name },
+                        { name: 'Dzeta (2)', avg: 32.7, sd: 12.0, level: getLevelData(32.7, 'CIENCIAS NATURALES').name },
+                        { name: 'Epsilon (3)', avg: 30.7, sd: 15.0, level: getLevelData(30.7, 'CIENCIAS NATURALES').name }
+                    ],
+                    frictions: [
+                        { afirmacion: "Indagación (Comprende que a partir de la investigación científica se construyen explicaciones)", icfes_acierto: 40.0, gap: -10.2, foco: "Diseño experimental y análisis de evidencia (Competencia 3)" },
+                    ]
+                },
+                'INGLÉS': {
+                    target: 58.0, // A2
+                    satisfactorio_threshold: 56, // Usamos 56 como umbral A2/B1
+                    simulations: [
+                        { name: 'Sigma (1)', avg: 54.1, sd: 18.0, level: getLevelData(54.1, 'INGLÉS').name },
+                        { name: 'Dzeta (2)', avg: 42.1, sd: 15.0, level: getLevelData(42.1, 'INGLÉS').name },
+                        { name: 'Epsilon (3)', avg: 46.1, sd: 16.0, level: getLevelData(46.1, 'INGLÉS').name }
+                    ],
+                    frictions: [
+                        { afirmacion: "Comprensión de Lectura Inferencial (Parte 6 y 7)", icfes_acierto: 60.0, gap: -15.0, foco: "Habilidades de inferencia y vocabulario contextual avanzado (Competencia Pragmática)" }
+                    ]
+                }
+            },
+            
+            // SIMULACIÓN DE DATOS DE ESTUDIANTES CLAVE (5 Top y 5 Rezagados)
+            individualAreaProgression: {
+                // LECTURA CRÍTICA (Simulando puntajes consistentes para Top y Bottom)
+                'LECTURA CRÍTICA': [
+                    // Top 5
+                    { name: "RESTREPO ESCOBAR A.", s1: 70.7, s2: 73.5, s3: 75.1 },
+                    { name: "OSORIO C. JUAN E.", s1: 68.0, s2: 70.5, s3: 72.8 },
+                    { name: "LOPEZ S. DANIELA V.", s1: 65.8, s2: 68.0, s3: 69.5 },
+                    { name: "CHICA DUQUE DIEGO A.", s1: 63.4, s2: 65.1, s3: 67.2 },
+                    { name: "PLA MOLINA DOMENICO", s1: 73.2, s2: 61.0, s3: 65.8 },
+                    // Bottom 5 (Resagados)
+                    { name: "DE ORO L. JULIAN A.", s1: 24.4, s2: 19.5, s3: 24.4 },
+                    { name: "SARMIENTO M. GABRIELA", s1: 34.1, s2: 26.8, s3: 34.1 },
+                    { name: "BUSTAMANTE R. ROSARIO", s1: 36.6, s2: 30.2, s3: 35.1 },
+                    { name: "CAMPO MONTES JOLIE A.", s1: 41.5, s2: 39.0, s3: 40.1 },
+                    { name: "DE AVILA M. SEBASTIAN", s1: 48.8, s2: 41.5, s3: 45.0 }
+                ],
+                // Repetir la lógica para las otras 4 áreas usando la misma estructura (s1, s2, s3)
+                'MATEMÁTICAS': [
+                    { name: "RESTREPO ESCOBAR A.", s1: 78.0, s2: 60.0, s3: 70.0 }, { name: "OSORIO C. JUAN E.", s1: 70.0, s2: 40.0, s3: 62.0 }, { name: "RUIZ NEGRETE J.", s1: 52.0, s2: 30.0, s3: 56.0 }, { name: "LOPEZ S. DANIELA V.", s1: 42.0, s2: 24.0, s3: 60.0 }, { name: "BROCHERO DE L. H.", s1: 36.0, s2: 36.0, s3: 62.0 }, 
+                    { name: "AYAZO DIAZ SANTIAGO", s1: 28.0, s2: 22.0, s3: 18.0 }, { name: "DE ORO L. JULIAN A.", s1: 18.0, s2: 30.0, s3: 18.0 }, { name: "SARMIENTO M. GABRIELA", s1: 24.0, s2: 24.0, s3: 18.0 }, { name: "HERNANDEZ C. JOSHUAR", s1: 38.0, s2: 12.0, s3: 38.0 }, { name: "CASTILLO C. DANNA S.", s1: 22.0, s2: 22.0, s3: 28.0 }
+                ],
+                'SOCIALES Y CIUDADANAS': [
+                    { name: "SALAZAR ORTUÑEZ J.", s1: 86.0, s2: 78.0, s3: 88.0 }, { name: "RIOS FALLA SARA C.", s1: 80.0, s2: 84.0, s3: 82.0 }, { name: "RESTREPO ESCOBAR A.", s1: 86.0, s2: 72.0, s3: 86.0 }, { name: "CHICA DUQUE DIEGO A.", s1: 74.0, s2: 72.0, s3: 80.0 }, { name: "RUIZ NEGRETE J.", s1: 74.0, s2: 62.0, s3: 80.0 },
+                    { name: "BARRIOS CARRASCAL C.", s1: 34.0, s2: 28.0, s3: 30.0 }, { name: "CAMPO MONTES JOLIE A.", s1: 42.0, s2: 32.0, s3: 32.0 }, { name: "DE ORO L. JULIAN A.", s1: 18.0, s2: 28.0, s3: 34.0 }, { name: "AYAZO DIAZ SANTIAGO", s1: 58.0, s2: 20.0, s3: 20.0 }, { name: "SARMIENTO M. GABRIELA", s1: 26.0, s2: 28.0, s3: 34.0 }
+                ],
+                'CIENCIAS NATURALES': [
+                    { name: "RESTREPO ESCOBAR A.", s1: 67.2, s2: 60.3, s3: 43.1 }, { name: "OSORIO C. JUAN E.", s1: 65.5, s2: 19.0, s3: 31.0 }, { name: "ESTARITA C. SAMUEL E.", s1: 67.2, s2: 63.8, s3: 43.1 }, { name: "SALAZAR ORTUÑEZ J.", s1: 67.2, s2: 62.1, s3: 46.5 }, { name: "CHICA DUQUE DIEGO A.", s1: 60.3, s2: 53.5, s3: 32.8 },
+                    { name: "SARMIENTO M. GABRIELA", s1: 27.6, s2: 29.3, s3: 12.1 }, { name: "DE ORO L. JULIAN A.", s1: 10.3, s2: 19.0, s3: 10.3 }, { name: "ORTIZ VILORIA S.", s1: 24.1, s2: 24.1, s3: 22.4 }, { name: "VISBAL OSORIO A.", s1: 25.9, s2: 8.6, s3: 27.6 }, { name: "CAMPO MONTES J.", s1: 34.5, s2: 17.2, s3: 17.2 }
+                ],
+                'INGLÉS': [
+                    { name: "RIOS FALLA SARA C.", s1: 100.0, s2: 85.5, s3: 78.2 }, { name: "PLA MOLINA DOMENICO", s1: 92.7, s2: 83.6, s3: 89.1 }, { name: "SALAS SARMIENTO S.", s1: 90.9, s2: 80.0, s3: 89.1 }, { name: "OSORIO C. JUAN E.", s1: 89.1, s2: 70.9, s3: 85.5 }, { name: "TRESPALACIO M. E.", s1: 87.3, s2: 76.4, s3: 76.4 },
+                    { name: "ORJUELA GUTIERREZ Y.", s1: 16.4, s2: 72.7, s3: 14.6 }, { name: "DE AVILA M. SEBASTIAN", s1: 16.4, s2: 16.4, s3: 16.4 }, { name: "ARIAS ALZATE SARA L.", s1: 63.6, s2: 49.1, s3: 29.1 }, { name: "FERRER GONZALEZ D.", s1: 25.4, s2: 23.6, s3: 25.4 }, { name: "JIMENEZ GUTIERREZ A.", s1: 25.4, s2: 29.1, s3: 27.3 }
+                ]
+            }
+        };
+
+        
+        // =================================================================
+        // CONFIGURACIÓN DE GRÁFICOS
+        // =================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            drawGlobalScoreChart();
+            renderAreaDetails();
+        });
+
+
+        // GRÁFICO 1: PUNTAJE GLOBAL (BARRA) - Lógica se mantiene igual
+        function drawGlobalScoreChart() {
+            const ctx = document.getElementById('globalScoreChart').getContext('2d');
+            const dataLabels = consolidatedData.globalScores.map(d => d.name);
+            const dataValues = consolidatedData.globalScores.map(d => d.score);
+            const targetScore = consolidatedData.icfesTarget;
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dataLabels,
+                    datasets: [{
+                        label: 'Puntaje Global Promedio (0-500)',
+                        data: dataValues,
+                        backgroundColor: consolidatedData.globalScores.map(d => d.type === 'Target' ? '#004d99' : '#4dabf5'),
+                        borderColor: consolidatedData.globalScores.map(d => d.type === 'Target' ? '#003366' : '#2286e6'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 400, title: { display: true, text: 'Puntaje Global' } } },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Progreso de Entrenamiento vs. Meta Oficial' },
+                        annotation: { annotations: { targetLine: { type: 'line', yMin: targetScore, yMax: targetScore, borderColor: 'red', borderWidth: 2, borderDash: [5, 5], label: { content: `ICFES Target ${targetScore}`, display: true, position: 'start' } } } }
+                    }
+                }
+            });
+        }
+        
+        // GRÁFICO 2: DESEMPEÑO POR ÁREA (LÍNEAS CON RANGOS)
+        function drawAreaProgressionChart(ctx, areaName, data, targetScore, satThreshold) {
+            
+            const labels = data.map(d => d.name);
+            const avgScores = data.map(d => d.avg);
+            const sdValues = data.map(d => d.sd);
+
+            const lowerBounds = avgScores.map((avg, i) => avg - sdValues[i]);
+            const upperBounds = avgScores.map((avg, i) => avg + sdValues[i]);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Límite Superior (Avg + SD)',
+                            data: upperBounds,
+                            borderColor: 'rgba(23, 162, 184, 0.5)', 
+                            backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                            borderWidth: 1,
+                            fill: 'origin', 
+                            tension: 0.2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Promedio Institucional',
+                            data: avgScores,
+                            borderColor: '#17a2b8', 
+                            backgroundColor: '#17a2b8',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.2,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#17a2b8'
+                        },
+                        {
+                            label: 'Límite Inferior (Avg - SD)',
+                            data: lowerBounds,
+                            borderColor: 'rgba(23, 162, 184, 0.5)',
+                            backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                            borderWidth: 1,
+                            fill: '-1', 
+                            tension: 0.2,
+                            pointRadius: 0
+                        },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Puntaje Promedio (0-100)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: `Evolución del Promedio y Variabilidad en ${areaName}` },
+                        annotation: {
+                            annotations: {
+                                targetLine: {
+                                    type: 'line',
+                                    yMin: targetScore,
+                                    yMax: targetScore,
+                                    borderColor: 'red',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    label: { content: `ICFES Target ${targetScore.toFixed(1)} (Histórico)`, display: true, position: 'start' }
+                                },
+                                satisfactoryLine: {
+                                    type: 'line',
+                                    yMin: satThreshold,
+                                    yMax: satThreshold,
+                                    borderColor: 'deepskyblue',
+                                    borderWidth: 1,
+                                    borderDash: [5, 1],
+                                    label: { content: `Umbral Satisfactorio (${satThreshold})`, display: true, position: 'end' }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // TABLA 1: RESUMEN DE PROGRESIÓN POR ÁREA
+        function createSummaryTable(areaName, data, target) {
+            let html = `<p><strong>Meta Histórica de Acierto (ICFES 2025):</strong> ${target.toFixed(1)} puntos.</p>`;
+            html += `<table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Simulacro</th>
+                        <th>Promedio</th>
+                        <th>Desviación Est.</th>
+                        <th>Nivel Desempeño</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
+            data.forEach(sim => {
+                const levelData = getLevelData(sim.avg, areaName);
+                html += `
+                    <tr>
+                        <td>${sim.name}</td>
+                        <td>${sim.avg.toFixed(1)}</td>
+                        <td>±${sim.sd.toFixed(1)}</td>
+                        <td class="${levelData.class}">${levelData.name}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        // TABLA 2: PROGRESIÓN INDIVIDUAL (TOP 5 Y BOTTOM 5)
+        function createIndividualProgressionTable(areaName, data) {
+            // Utilizamos los 5 primeros como Top y los 5 últimos como Bottom
+            const top5 = data.slice(0, 5); 
+            const bottom5 = data.slice(-5);
+
+            let html = `<div class="progression-table-container">`;
+
+            // Función auxiliar para generar la tabla de progresión
+            const renderProgressionTable = (students, title, headerClass) => {
+                let rows = `<table class="progression-table"><thead><tr><th colspan="7" class="${headerClass}">${title}</th></tr>
+                    <tr><th>Estudiante</th><th>S1</th><th>Nivel</th><th>S2</th><th>Nivel</th><th>S3</th><th>Nivel</th></tr></thead><tbody>`;
+                
+                students.forEach(s => {
+                    const level1 = getLevelData(s.s1, areaName);
+                    const level2 = getLevelData(s.s2, areaName);
+                    const level3 = getLevelData(s.s3, areaName);
+
+                    rows += `
+                        <tr>
+                            <td>${s.name}</td>
+                            <td>${s.s1.toFixed(1)}</td>
+                            <td class="${level1.class}">${level1.name}</td>
+                            <td>${s.s2.toFixed(1)}</td>
+                            <td class="${level2.class}">${level2.name}</td>
+                            <td>${s.s3.toFixed(1)}</td>
+                            <td class="${level3.class}">${level3.name}</td>
+                        </tr>
+                    `;
+                });
+                rows += `</tbody></table>`;
+                return rows;
+            };
+
+            html += renderProgressionTable(top5, '5 Mejores Estudiantes por Promedio Consolidado', 'top-header');
+            html += renderProgressionTable(bottom5, '5 Estudiantes con Mayor Dificultad (Rezagados)', 'bottom-header');
+            
+            html += `</div>`;
+            return html;
+        }
+
+        // RECOMENDACIONES DETALLADAS
+        function createRecommendationBox(areaName, frictions) {
+            let html = `<div class="recommendation-full">
+                <h4>Recomendación Estratégica 2026 para ${areaName}</h4>
+                <p>El Plan de Mejora Institucional (PMI) debe focalizar sus esfuerzos en las siguientes Afirmaciones/Competencias, buscando cerrar la brecha identificada contra el Saber 11:</p>`;
+            
+            frictions.forEach(friction => {
+                const aciertoIcfes = friction.icfes_acierto.toFixed(1);
+                const gapType = friction.gap > 0 ? ' (ALERTA DE CALIBRACIÓN - SIMULACRO FUE FÁCIL)' : ' (PRIORIDAD TÁCTICA)';
+                
+                html += `
+                    <p style="margin-bottom: 5px;">
+                        <strong>🎯 Foco: ${friction.foco}</strong><br>
+                        - **Objetivo Estratégico:** Nivelar el desempeño en la Afirmación "${friction.afirmacion.split('(')[0]}".<br>
+                        - **Brecha Histórica:** Se requiere un aumento del **${Math.abs(friction.gap).toFixed(1)}%** para alcanzar el acierto histórico esperado (${aciertoIcfes}%)${gapType}.<br>
+                        - **Acción Sugerida Edúcate:** Desarrollar módulos de entrenamiento específicos (micro-learning) que fuercen la aplicación de esta evidencia en contextos novedosos y complejos. Reforzar el rol del profesor como facilitador de la transferencia de conocimiento.
+                    </p>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        // FUNCIÓN PRINCIPAL DE RENDERIZADO DETALLADO
+        function renderAreaDetails() {
+            const container = document.getElementById('areaDetails');
+            
+            for (const area in consolidatedData.areas) {
+                const areaData = consolidatedData.areas[area];
+                
+                const areaHtml = document.createElement('div');
+                areaHtml.className = 'area-section';
+                areaHtml.innerHTML = `
+                    <h3 class="area-title">${area}</h3>
+                    
+                    <div style="margin-top: 15px;">
+                        <h4>2.1. Tendencia de Desempeño (Promedio, Variabilidad y Meta Satisfactorio)</h4>
+                        <div class="chart-container">
+                            <canvas id="${area.replace(/\s/g, '_')}Chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <h4>2.2. Resumen Numérico y Niveles de Desempeño</h4>
+                    ${createSummaryTable(area, areaData.simulations, areaData.target)}
+
+                    <h4 style="margin-top: 20px;">2.3. Progresión de Estudiantes Clave</h4>
+                    ${createIndividualProgressionTable(area, consolidatedData.individualAreaProgression[area] || [])}
+
+                    ${createRecommendationBox(area, areaData.frictions)}
+                `;
+                container.appendChild(areaHtml);
+                
+                // Dibujar el gráfico de líneas después de inyectar el HTML
+                const ctx = document.getElementById(`${area.replace(/\s/g, '_')}Chart`).getContext('2d');
+                drawAreaProgressionChart(ctx, area, areaData.simulations, areaData.target, areaData.satisfactorio_threshold);
+            }
+        }
+
+    </script>
+
+</body>
+</html>
